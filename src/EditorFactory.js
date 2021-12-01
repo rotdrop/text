@@ -19,22 +19,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { Editor, Text } from 'tiptap'
-import {
-	HardBreak,
-	Heading,
-	Code,
-	OrderedList,
-	Blockquote,
-	CodeBlock,
-	CodeBlockHighlight,
-	HorizontalRule,
-	History,
-	TrailingNode,
-	Placeholder,
-} from 'tiptap-extensions'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Text from '@tiptap/extension-text'
+import History from '@tiptap/extension-history'
+import Placeholder from '@tiptap/extension-placeholder'
+import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
-import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
+// import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
 import { translate as t } from '@nextcloud/l10n'
@@ -65,39 +57,39 @@ const createEditor = ({ content, onInit, onUpdate, extensions, enableRichEditing
 	let richEditingExtensions = []
 	if (enableRichEditing) {
 		richEditingExtensions = [
-			new Heading(),
-			new Code(),
-			new Strong(),
-			new Italic(),
-			new Strike(),
-			new HardBreak(),
-			new HorizontalRule(),
+			Document,
+			Paragraph,
+			Text,
+			History,
+			Strong,
+			Italic,
+			Strike,
+			Link,
+			// .configure ({openOnClick: true, }),
+			/*
 			new BulletList(),
-			new OrderedList(),
-			new Blockquote(),
-			new CodeBlock(),
 			new ListItem(),
-			new Link({
-				openOnClick: true,
-			}),
 			new Image({ currentDirectory }),
-			new Placeholder({
+			*/
+			Placeholder.configure({
 				emptyNodeClass: 'is-empty',
-				emptyNodeText: t('text', 'Add notes, lists or links …'),
+				placeholder: t('text', 'Add notes, lists or links …'),
 				showOnlyWhenEditable: true,
 			}),
-			new TrailingNode({
-				node: 'paragraph',
-				notAfter: ['paragraph'],
-			}),
+			// TODO: replace this
+			// https://github.com/ueberdosis/tiptap/tree/main/demos/src/Experiments/TrailingNode
+			// new TrailingNode({ node: 'paragraph', notAfter: ['paragraph'], }),
 		]
 	} else {
 		richEditingExtensions = [
-			new PlainTextDocument(),
+			new Document(),
+			new Paragraph(),
 			new Text(),
-			new CodeBlockHighlight({
-				...languages,
-			}),
+			new History(),
+			// disable our custom extensions for now
+			// new PlainTextDocument(),
+			// FIXME: Do we want to use CodeBlockLowlight instead?
+			// new CodeBlockHighlight({ ...languages, }),
 		]
 	}
 	extensions = extensions || []
@@ -107,7 +99,6 @@ const createEditor = ({ content, onInit, onUpdate, extensions, enableRichEditing
 		onUpdate,
 		extensions: [
 			...richEditingExtensions,
-			new History(),
 		].concat(extensions),
 		useBuiltInExtensions: enableRichEditing,
 	})

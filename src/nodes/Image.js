@@ -20,7 +20,7 @@
  *
  */
 
-import { Image as TiptapImage } from 'tiptap-extensions'
+import TiptapImage from '@tiptap/extension-image'
 import ImageView from './ImageView'
 
 export default class Image extends TiptapImage {

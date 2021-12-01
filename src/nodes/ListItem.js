@@ -20,9 +20,13 @@
  *
  */
 
-import { ListItem as TiptapListItem } from 'tiptap-extensions'
-import { Plugin } from 'tiptap'
-import { toggleList, wrappingInputRule } from 'tiptap-commands'
+import TipTapListItem from '@tiptap/extension-list-item'
+
+export default TipTapListItem.extend({})
+
+/*
+import Plugin
+import wrappingInputRule,
 import { findParentNode, findParentNodeClosestToPos } from 'prosemirror-utils'
 import { listInputRule } from '../commands'
 
@@ -99,14 +103,12 @@ export default class ListItem extends TiptapListItem {
 		}
 	}
 
-	commands({ type, schema }) {
+	addCommands() {
 		return {
-			bullet_list_item: () => {
-				return (state, dispatch, view) => {
-					return toggleList(schema.nodes.bullet_list, type)(state, dispatch, view)
-				}
+			bulletListItem: () => ({ commands }) => {
+				return commands.toggleList()
 			},
-			todo_item: () => {
+			todo_item: () => ({ commands }) => {
 				return (state, dispatch, view) => {
 					const schema = state.schema
 					const selection = state.selection
@@ -118,7 +120,8 @@ export default class ListItem extends TiptapListItem {
 					let parentList = getParentList(schema, selection)
 
 					if (typeof parentList === 'undefined') {
-						toggleList(schema.nodes.bullet_list, type)(state, (_transaction) => {
+						// FIXME: not sure how this command now works
+						commands.toggleList(schema.nodes.bullet_list, type)(state, (_transaction) => {
 							tr = _transaction
 						}, view)
 						parentList = getParentList(schema, tr.selection)
@@ -185,3 +188,4 @@ export default class ListItem extends TiptapListItem {
 	}
 
 }
+*/

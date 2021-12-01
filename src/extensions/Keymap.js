@@ -20,7 +20,8 @@
  *
  */
 
-import { Extension, Plugin } from 'tiptap'
+import { Extension } from '@tiptap/core'
+import { Plugin } from 'prosemirror-state'
 
 export default class Keymap extends Extension {
 

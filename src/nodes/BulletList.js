@@ -20,7 +20,7 @@
  *
  */
 
-import { BulletList as TiptapBulletList } from 'tiptap-extensions'
+import TiptapBulletList from '@tiptap/starter-kit'
 
 export default class BulletList extends TiptapBulletList {
 

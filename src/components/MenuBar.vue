@@ -21,71 +21,68 @@
   -->
 
 <template>
-	<EditorMenuBar v-slot="{ commands, isActive, focused }" :editor="editor">
-		<div class="menubar" :class="{ 'is-focused': focused, 'autohide': autohide }">
-			<div v-if="isRichEditor" ref="menubar" class="menubar-icons">
-				<template v-for="(icon, $index) in allIcons">
-					<EmojiPicker v-if="icon.class === 'icon-emoji'"
+	<div class="menubar" :class="{ 'is-focused': focused, 'autohide': autohide }">
+		<div v-if="isRichEditor" ref="menubar" class="menubar-icons">
+			<template v-for="(icon, $index) in allIcons">
+				<EmojiPicker v-if="icon.class === 'icon-emoji'"
+					:key="icon.label"
+					class="menuitem-emoji"
+					@select="emojiObject => addEmoji(commands, allIcons.find(i => i.class === 'icon-emoji'), emojiObject)">
+					<button v-tooltip="t('text', 'Insert emoji')"
+						class="icon-emoji"
+						:aria-label="t('text', 'Insert emoji')"
+						:aria-haspopup="true" />
+				</EmojiPicker>
+				<button v-else-if="icon.class"
+					v-show="$index < iconCount"
+					:key="icon.label"
+					v-tooltip="getLabelAndKeys(icon)"
+					:class="getIconClasses(isActive, icon)"
+					:disabled="disabled(commands, icon)"
+					@click="clickIcon(commands, icon)" />
+				<template v-else>
+					<div v-show="$index < iconCount || !icon.class"
 						:key="icon.label"
-						class="menuitem-emoji"
-						@select="emojiObject => addEmoji(commands, allIcons.find(i => i.class === 'icon-emoji'), emojiObject)">
-						<button v-tooltip="t('text', 'Insert emoji')"
-							class="icon-emoji"
-							:aria-label="t('text', 'Insert emoji')"
-							:aria-haspopup="true" />
-					</EmojiPicker>
-					<button v-else-if="icon.class"
-						v-show="$index < iconCount"
-						:key="icon.label"
-						v-tooltip="getLabelAndKeys(icon)"
-						:class="getIconClasses(isActive, icon)"
-						:disabled="disabled(commands, icon)"
-						@click="clickIcon(commands, icon)" />
-					<template v-else>
-						<div v-show="$index < iconCount || !icon.class"
-							:key="icon.label"
-							v-click-outside="() => hideChildMenu(icon)"
-							class="submenu">
-							<button v-tooltip="getLabelAndKeys(icon)"
-								:class="childIconClasses(isActive, icon.children, )"
-								@click.prevent="toggleChildMenu(icon)" />
-							<div :class="{open: isChildMenuVisible(icon)}" class="popovermenu menu-center">
-								<PopoverMenu :menu="childPopoverMenu(isActive, commands, icon.children, icon)" />
-							</div>
+						v-click-outside="() => hideChildMenu(icon)"
+						class="submenu">
+						<button v-tooltip="getLabelAndKeys(icon)"
+							:class="childIconClasses(isActive, icon.children, )"
+							@click.prevent="toggleChildMenu(icon)" />
+						<div :class="{open: isChildMenuVisible(icon)}" class="popovermenu menu-center">
+							<PopoverMenu :menu="childPopoverMenu(isActive, commands, icon.children, icon)" />
 						</div>
-					</template>
+					</div>
 				</template>
-				<Actions>
-					<template v-for="(icon, $index) in allIcons">
-						<ActionButton v-if="icon.class && isHiddenInMenu($index) && !(icon.class === 'icon-emoji')"
-							:key="icon.class"
-							v-tooltip="getKeys(icon)"
-							:icon="icon.class"
-							:close-after-click="true"
-							@click="clickIcon(commands, icon)">
-							{{ icon.label }}
+			</template>
+			<Actions>
+				<template v-for="(icon, $index) in allIcons">
+					<ActionButton v-if="icon.class && isHiddenInMenu($index) && !(icon.class === 'icon-emoji')"
+						:key="icon.class"
+						v-tooltip="getKeys(icon)"
+						:icon="icon.class"
+						:close-after-click="true"
+						@click="clickIcon(commands, icon)">
+						{{ icon.label }}
+					</ActionButton>
+					<!--<template v-else-if="!icon.class && isHiddenInMenu($index)">
+						<ActionButton v-for="childIcon in icon.children"
+							:key="childIcon.class"
+							:icon="childIcon.class"
+							@click="clickIcon(commands, childIcon)">
+							v-tooltip="getKeys(childIcon)"
+							{{ childIcon.label }}
 						</ActionButton>
-						<!--<template v-else-if="!icon.class && isHiddenInMenu($index)">
-							<ActionButton v-for="childIcon in icon.children"
-								:key="childIcon.class"
-								:icon="childIcon.class"
-								@click="clickIcon(commands, childIcon)">
-								v-tooltip="getKeys(childIcon)"
-								{{ childIcon.label }}
-							</ActionButton>
-						</template>-->
-					</template>
-				</Actions>
-			</div>
-			<slot>
-				Left side
-			</slot>
+					</template>-->
+				</template>
+			</Actions>
 		</div>
-	</EditorMenuBar>
+		<slot>
+			Left side
+		</slot>
+	</div>
 </template>
 
 <script>
-import { EditorMenuBar } from 'tiptap'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
 import menuBarIcons from './../mixins/menubar'
 import { optimalPath } from './../helpers/files'
@@ -101,7 +98,6 @@ import { getCurrentUser } from '@nextcloud/auth'
 export default {
 	name: 'MenuBar',
 	components: {
-		EditorMenuBar,
 		ActionButton,
 		PopoverMenu,
 		Actions,

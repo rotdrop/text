@@ -35,6 +35,7 @@
 		</div>
 		<div v-if="currentSession && active" id="editor-wrapper" :class="{'has-conflicts': hasSyncCollission, 'icon-loading': !initialLoading && !hasConnectionIssue, 'richEditor': isRichEditor, 'show-color-annotations': showAuthorAnnotations}">
 			<div id="editor">
+				<!--
 				<MenuBar v-if="!syncError && !readOnly"
 					ref="menubar"
 					:editor="tiptap"
@@ -52,10 +53,13 @@
 					</div>
 					<slot name="header" />
 				</MenuBar>
+				-->
 				<div class="content-wrapper">
+					<!--
 					<MenuBubble v-if="!readOnly && isRichEditor"
 						:editor="tiptap"
 						:file-path="relativePath" />
+					-->
 					<EditorContent v-show="initialLoading"
 						class="editor__content"
 						:editor="tiptap" />
@@ -80,27 +84,22 @@ import { endpointUrl, getRandomGuestName } from './../helpers'
 import { extensionHighlight } from '../helpers/mappings'
 import { createEditor, markdownit, createMarkdownSerializer, serializePlainText, loadSyntaxHighlight } from './../EditorFactory'
 
-import { EditorContent } from 'tiptap'
-import { Collaboration } from 'tiptap-extensions'
-import { Emoji, Keymap, UserColor } from './../extensions'
+import { EditorContent } from '@tiptap/vue-2'
+// import { Emoji, Keymap, UserColor } from './../extensions'
 import isMobile from './../mixins/isMobile'
 import store from './../mixins/store'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
-import { getVersion, receiveTransaction } from 'prosemirror-collab'
-import { Step } from 'prosemirror-transform'
-
-const EDITOR_PUSH_DEBOUNCE = 200
 
 export default {
 	name: 'EditorWrapper',
 	components: {
 		EditorContent,
-		MenuBar: () => import(/* webpackChunkName: "editor-rich" */'./MenuBar'),
-		MenuBubble: () => import(/* webpackChunkName: "editor-rich" */'./MenuBubble'),
+		// MenuBar: () => import(/* webpackChunkName: "editor-rich" */'./MenuBar'),
+		// MenuBubble: () => import(/* webpackChunkName: "editor-rich" */'./MenuBubble'),
 		ReadOnlyEditor: () => import(/* webpackChunkName: "editor" */'./ReadOnlyEditor'),
 		CollisionResolveDialog: () => import(/* webpackChunkName: "editor" */'./CollisionResolveDialog'),
-		GuestNameDialog: () => import(/* webpackChunkName: "editor-guest" */'./GuestNameDialog'),
-		SessionList: () => import(/* webpackChunkName: "editor-collab" */'./SessionList'),
+		// GuestNameDialog: () => import(/* webpackChunkName: "editor-guest" */'./GuestNameDialog'),
+		// SessionList: () => import(/* webpackChunkName: "editor-collab" */'./SessionList'),
 	},
 	directives: {
 		Tooltip,
@@ -163,7 +162,8 @@ export default {
 
 			idle: false,
 			dirty: false,
-			initialLoading: false,
+			// FIXME: revert to false once we use collaboration again
+			initialLoading: true,
 			lastSavedString: '',
 			syncError: null,
 			hasConnectionIssue: false,
@@ -314,35 +314,9 @@ export default {
 							onUpdate: ({ state }) => {
 								this.syncService.state = state
 							},
+							/* TODO: bring back our extensions
 							extensions: [
-								new Collaboration({
-								// the initial version we start with
-								// version is an integer which is incremented with every change
-									version: this.document.initialVersion,
-									clientID: this.currentSession.id,
-									// debounce changes so we can save some bandwidth
-									debounce: EDITOR_PUSH_DEBOUNCE,
-									onSendable: ({ sendable }) => {
-										if (this.syncService) {
-											this.syncService.sendSteps()
-										}
-									},
-									update: ({ steps, version, editor }) => {
-										const { state, view, schema } = editor
-
-										if (getVersion(state) > version) {
-											return
-										}
-
-										const tr = receiveTransaction(
-											state,
-											steps.map(item => Step.fromJSON(schema, item.step)),
-											steps.map(item => item.clientID),
-										)
-										tr.setMeta('clientID', steps.map(item => item.clientID))
-										view.dispatch(tr)
-									},
-								}),
+								// TODO: bring back collaboration
 								new UserColor({
 									clientID: this.currentSession.id,
 									color: (clientID) => {
@@ -362,6 +336,7 @@ export default {
 								}),
 								new Emoji(),
 							],
+							*/
 							enableRichEditing: this.isRichEditor,
 							languages,
 							currentDirectory: this.currentDirectory,

@@ -20,138 +20,75 @@
  *
  */
 
-import { Bold, Italic as TipTapItalic, Strike as TipTapStrike, Link as TipTapLink } from 'tiptap-extensions'
-import { Plugin } from 'tiptap'
-import { getMarkAttrs } from 'tiptap-utils'
-import { markInputRule, markPasteRule } from 'tiptap-commands'
+import Bold from '@tiptap/extension-bold'
+import TipTapItalic from '@tiptap/extension-italic'
+import TipTapStrike from '@tiptap/extension-strike'
+import TipTapLink from '@tiptap/extension-link'
+// import { Plugin } from 'prosemirror-state'
 import { domHref, parseHref } from './../helpers/links'
-import { markdownit } from './../EditorFactory'
+// import { markdownit } from './../EditorFactory'
 
 /**
  * This file maps prosemirror mark names to tiptap classes,
  * so we can reuse the prosemirror-markdown default parser for now
  */
+const Strong = Bold.extend({
+	name: 'strong',
+})
 
-class Strong extends Bold {
+const Italic = TipTapItalic.extend({
+	name: 'em',
+})
 
-	get name() {
-		return 'strong'
-	}
+const Strike = TipTapStrike.extend({
+	parseDOM: [
+		{
+			tag: 's',
+		},
+		{
+			tag: 'del',
+		},
+		{
+			tag: 'strike',
+		},
+		{
+			style: 'text-decoration',
+			getAttrs: value => value === 'line-through',
+		},
+	],
+	toDOM: () => ['s', 0],
+	toMarkdown: {
+		open: '~~',
+		close: '~~',
+		mixable: true,
+		expelEnclosingWhitespace: true,
+	},
+})
 
-	// TODO: remove once we upgraded to tiptap v2
-	inputRules({ type }) {
-		return [
-			markInputRule(/(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))$/, type),
-			markInputRule(/(?:^|\s)((?:__)((?:[^__]+))(?:__))$/, type),
-		]
-	}
+const Link = TipTapLink.extend({
+	attrs: {
+		href: {
+			default: null,
+		},
+	},
+	inclusive: false,
+	parseDOM: [
+		{
+			tag: 'a[href]',
+			getAttrs: dom => ({
+				href: parseHref(dom),
+			}),
+		},
+	],
+	toDOM: node => ['a', {
+		...node.attrs,
+		href: domHref(node),
+		title: node.attrs.href,
+		rel: 'noopener noreferrer nofollow',
+	}, 0],
+})
 
-	// TODO: remove once we upgraded to tiptap v2
-	pasteRules({ type }) {
-		return [
-			markPasteRule(/(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))/g, type),
-			markPasteRule(/(?:^|\s)((?:__)((?:[^__]+))(?:__))/g, type),
-		]
-	}
-
-}
-
-class Italic extends TipTapItalic {
-
-	get name() {
-		return 'em'
-	}
-
-	// TODO: remove once we upgraded to tiptap v2
-	inputRules({ type }) {
-		return [
-			markInputRule(/(?:^|\s)((?:\*)((?:[^*]+))(?:\*))$/, type),
-			markInputRule(/(?:^|\s)((?:_)((?:[^_]+))(?:_))$/, type),
-		]
-	}
-
-	// TODO: remove once we upgraded to tiptap v2
-	pasteRules({ type }) {
-		return [
-			markPasteRule(/(?:^|\s)((?:\*)((?:[^*]+))(?:\*))/g, type),
-			markPasteRule(/(?:^|\s)((?:_)((?:[^_]+))(?:_))/g, type),
-		]
-	}
-
-}
-
-class Strike extends TipTapStrike {
-
-	get schema() {
-		return {
-			parseDOM: [
-				{
-					tag: 's',
-				},
-				{
-					tag: 'del',
-				},
-				{
-					tag: 'strike',
-				},
-				{
-					style: 'text-decoration',
-					getAttrs: value => value === 'line-through',
-				},
-			],
-			toDOM: () => ['s', 0],
-			toMarkdown: {
-				open: '~~',
-				close: '~~',
-				mixable: true,
-				expelEnclosingWhitespace: true,
-			},
-		}
-	}
-
-	// TODO: remove once we upgraded to tiptap v2
-	inputRules({ type }) {
-		return [
-			markInputRule(/(?:^|\s)((?:~~)((?:[^~]+))(?:~~))$/, type),
-		]
-	}
-
-	// TODO: remove once we upgraded to tiptap v2
-	pasteRules({ type }) {
-		return [
-			markPasteRule(/(?:^|\s)((?:~~)((?:[^~]+))(?:~~))/g, type),
-		]
-	}
-
-}
-
-class Link extends TipTapLink {
-
-	get schema() {
-		return {
-			attrs: {
-				href: {
-					default: null,
-				},
-			},
-			inclusive: false,
-			parseDOM: [
-				{
-					tag: 'a[href]',
-					getAttrs: dom => ({
-						href: parseHref(dom),
-					}),
-				},
-			],
-			toDOM: node => ['a', {
-				...node.attrs,
-				href: domHref(node),
-				title: node.attrs.href,
-				rel: 'noopener noreferrer nofollow',
-			}, 0],
-		}
-	}
-
+/* TODO: addProsemirrorPlugins with this:
 	get plugins() {
 		if (!this.options.openOnClick) {
 			return []
@@ -161,8 +98,7 @@ class Link extends TipTapLink {
 			new Plugin({
 				props: {
 					handleClick: (view, pos, event) => {
-						const { schema } = view.state
-						const attrs = getMarkAttrs(view.state, schema.marks.link)
+						const attrs = this.editor.getAttributes('link')
 
 						const isLink = event.target instanceof HTMLAnchorElement || event.target.parentElement instanceof HTMLAnchorElement
 						if (attrs.href && isLink) {
@@ -200,9 +136,9 @@ class Link extends TipTapLink {
 	}
 
 }
+*/
 
 /** Strike is currently unsupported by prosemirror-markdown */
-
 export {
 	Strong,
 	Italic,
