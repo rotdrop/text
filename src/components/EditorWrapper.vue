@@ -62,12 +62,10 @@
 						:file-path="relativePath" />
 					<EmojiSuggestions v-if="!readOnly && isRichEditor"
 						:emoji-query="emojiQuery"
-						:emoji-range="emojiRange"
 						:filtered-emojis="filteredEmojis"
 						:navigated-emoji-index="navigatedEmojiIndex"
 						:emoji-rect="emojiRect"
-						:insert-emoji="insertEmoji"
-						@focus="tiptap.focus()" />
+						@select-emoji="selectEmoji($event)" />
 					<EditorContent v-show="initialLoading"
 						class="editor__content"
 						:editor="tiptap" />
@@ -99,6 +97,7 @@ import { Emoji, Keymap, UserColor } from './../extensions'
 import isMobile from './../mixins/isMobile'
 import store from './../mixins/store'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
+import { emojiSearch, addRecent } from '@nextcloud/vue/dist/Functions/emoji'
 import { getVersion, receiveTransaction } from 'prosemirror-collab'
 import { Step } from 'prosemirror-transform'
 
@@ -391,13 +390,8 @@ export default {
 									},
 								}),
 								new Emoji({
-									// a list of suggested emojis
-									items: async () => {
-										await new Promise(resolve => {
-											setTimeout(resolve, 500)
-										})
-										return EMOJIS
-									},
+									// Pass empty array as items, our emojiSearch doesn't need a dataset
+									items: () => [],
 									// Is called when an emoji suggestion starts
 									onEnter: ({ items, query, range, command, virtualNode }) => {
 										this.emojiQuery = query
@@ -435,6 +429,7 @@ export default {
 										}
 										if (event.key === 'Enter' || event.key === 'Tab') {
 											const emojiObject = this.filteredEmojis[this.navigatedEmojiIndex]
+											addRecent(emojiObject)
 											this.selectEmoji(emojiObject)
 											return true
 										}
@@ -443,6 +438,7 @@ export default {
 										}
 										return false
 									},
+									onFilter: (_, query) => emojiSearch(query),
 								}),
 								new Keymap({
 									'Mod-s': () => {
@@ -616,7 +612,7 @@ export default {
 				range: this.emojiRange,
 				attrs: {
 					id: emojiObject.short_name,
-					native: emojiObject.value,
+					native: emojiObject.native,
 				},
 			})
 			this.tiptap.focus()

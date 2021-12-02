@@ -37,7 +37,6 @@
 		"@nextcloud/router": "^2.0.0",
 		"@nextcloud/vue": "^4.3.0",
 		"core-js": "^3.20.2",
-		"emoji-datasource": "^7.0.2",
 		"entities": "^3.0.1",
 		"escape-html": "^1.0.3",
 		"highlight.js": "^10.7.2",
