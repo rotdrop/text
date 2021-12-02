@@ -86,9 +86,14 @@ import { createEditor, markdownit, createMarkdownSerializer, serializePlainText,
 
 import { EditorContent } from '@tiptap/vue-2'
 // import { Emoji, Keymap, UserColor } from './../extensions'
+import { Collaboration } from './../extensions'
 import isMobile from './../mixins/isMobile'
 import store from './../mixins/store'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
+import { getVersion, receiveTransaction } from 'prosemirror-collab'
+import { Step } from 'prosemirror-transform'
+
+const EDITOR_PUSH_DEBOUNCE = 200
 
 export default {
 	name: 'EditorWrapper',
@@ -162,8 +167,7 @@ export default {
 
 			idle: false,
 			dirty: false,
-			// FIXME: revert to false once we use collaboration again
-			initialLoading: true,
+			initialLoading: false,
 			lastSavedString: '',
 			syncError: null,
 			hasConnectionIssue: false,
@@ -279,7 +283,8 @@ export default {
 				forceRecreate: this.forceRecreate,
 				serialize: (document) => {
 					if (this.isRichEditor) {
-						return (createMarkdownSerializer(this.tiptap.nodes, this.tiptap.marks)).serialize(document)
+						const { nodes, marks } = this.tiptap.schema
+						return (createMarkdownSerializer(nodes, marks)).serialize(document)
 					}
 					return serializePlainText(this.tiptap)
 
@@ -307,16 +312,42 @@ export default {
 					loadSyntaxHighlight(extensionHighlight[this.fileExtension] ? extensionHighlight[this.fileExtension] : this.fileExtension).then((languages) => {
 						this.tiptap = createEditor({
 							content: this.isRichEditor ? markdownit.render(documentSource) : '<pre>' + escapeHtml(documentSource) + '</pre>',
-							onInit: ({ state }) => {
-								this.syncService.state = state
+							onCreate: ({ editor }) => {
+								this.syncService.state = editor.state
 								this.syncService.startSync()
 							},
-							onUpdate: ({ state }) => {
-								this.syncService.state = state
+							onUpdate: ({ editor }) => {
+								this.syncService.state = editor.state
 							},
-							/* TODO: bring back our extensions
 							extensions: [
-								// TODO: bring back collaboration
+								Collaboration.configure({
+									// the initial version we start with
+									// version is an integer which is incremented with every change
+									version: this.document.initialVersion,
+									clientID: this.currentSession.id,
+									// debounce changes so we can save some bandwidth
+									debounce: EDITOR_PUSH_DEBOUNCE,
+									onSendable: ({ sendable }) => {
+										if (this.syncService) {
+											this.syncService.sendSteps()
+										}
+									},
+									update: ({ steps, version, editor }) => {
+										const { state, view, schema } = editor
+										if (getVersion(state) > version) {
+											return
+										}
+										const tr = receiveTransaction(
+											state,
+											steps.map(item => Step.fromJSON(schema, item.step)),
+											steps.map(item => item.clientID),
+										)
+										tr.setMeta('clientID', steps.map(item => item.clientID))
+										view.dispatch(tr)
+									},
+								}),
+							],
+							/* TODO: bring back our extensions
 								new UserColor({
 									clientID: this.currentSession.id,
 									color: (clientID) => {
@@ -353,7 +384,8 @@ export default {
 				.on('sync', ({ steps, document }) => {
 					this.hasConnectionIssue = false
 					try {
-						this.tiptap.extensions.options.collaboration.update({
+						const collaboration = this.tiptap.extensionManager.extensions.find(e => e.name === 'collaboration')
+						collaboration.options.update({
 							version: document.currentVersion,
 							steps,
 							editor: this.tiptap,

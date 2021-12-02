@@ -53,14 +53,10 @@ const loadSyntaxHighlight = async (language) => {
 	return { languages: modules }
 }
 
-const createEditor = ({ content, onInit, onUpdate, extensions, enableRichEditing, languages, currentDirectory }) => {
+const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditing, languages, currentDirectory }) => {
 	let richEditingExtensions = []
 	if (enableRichEditing) {
 		richEditingExtensions = [
-			Document,
-			Paragraph,
-			Text,
-			History,
 			Strong,
 			Italic,
 			Strike,
@@ -82,12 +78,8 @@ const createEditor = ({ content, onInit, onUpdate, extensions, enableRichEditing
 		]
 	} else {
 		richEditingExtensions = [
-			new Document(),
-			new Paragraph(),
-			new Text(),
-			new History(),
 			// disable our custom extensions for now
-			// new PlainTextDocument(),
+			// PlainTextDocument,
 			// FIXME: Do we want to use CodeBlockLowlight instead?
 			// new CodeBlockHighlight({ ...languages, }),
 		]
@@ -95,12 +87,15 @@ const createEditor = ({ content, onInit, onUpdate, extensions, enableRichEditing
 	extensions = extensions || []
 	return new Editor({
 		content,
-		onInit,
+		onCreate,
 		onUpdate,
 		extensions: [
+			Document,
+			Paragraph,
+			Text,
+			History,
 			...richEditingExtensions,
 		].concat(extensions),
-		useBuiltInExtensions: enableRichEditing,
 	})
 }
 

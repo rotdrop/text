@@ -20,12 +20,14 @@
  *
  */
 
-import Emoji from './Emoji'
-import Keymap from './Keymap'
-import UserColor from './UserColor'
+// import Emoji from './Emoji'
+// import Keymap from './Keymap'
+// import UserColor from './UserColor'
+import Collaboration from './Collaboration'
 
 export {
-	Emoji,
-	Keymap,
-	UserColor,
+// Emoji,
+// Keymap,
+// UserColor,
+	Collaboration,
 }
