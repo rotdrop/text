@@ -35,8 +35,7 @@
 		</div>
 		<div v-if="currentSession && active" id="editor-wrapper" :class="{'has-conflicts': hasSyncCollission, 'icon-loading': !initialLoading && !hasConnectionIssue, 'richEditor': isRichEditor, 'show-color-annotations': showAuthorAnnotations}">
 			<div id="editor">
-				<!--
-				<MenuBar v-if="!syncError && !readOnly"
+				<MenuBar v-if="tiptap && !syncError && !readOnly"
 					ref="menubar"
 					:editor="tiptap"
 					:file-path="relativePath"
@@ -53,7 +52,6 @@
 					</div>
 					<slot name="header" />
 				</MenuBar>
-				-->
 				<div class="content-wrapper">
 					<!--
 					<MenuBubble v-if="!readOnly && isRichEditor"
@@ -99,12 +97,12 @@ export default {
 	name: 'EditorWrapper',
 	components: {
 		EditorContent,
-		// MenuBar: () => import(/* webpackChunkName: "editor-rich" */'./MenuBar'),
+		MenuBar: () => import(/* webpackChunkName: "editor-rich" */'./MenuBar'),
 		// MenuBubble: () => import(/* webpackChunkName: "editor-rich" */'./MenuBubble'),
 		ReadOnlyEditor: () => import(/* webpackChunkName: "editor" */'./ReadOnlyEditor'),
 		CollisionResolveDialog: () => import(/* webpackChunkName: "editor" */'./CollisionResolveDialog'),
 		// GuestNameDialog: () => import(/* webpackChunkName: "editor-guest" */'./GuestNameDialog'),
-		// SessionList: () => import(/* webpackChunkName: "editor-collab" */'./SessionList'),
+		SessionList: () => import(/* webpackChunkName: "editor-collab" */'./SessionList'),
 	},
 	directives: {
 		Tooltip,

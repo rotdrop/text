@@ -21,13 +21,13 @@
   -->
 
 <template>
-	<div class="menubar" :class="{ 'is-focused': focused, 'autohide': autohide }">
+	<div class="menubar" :class="{ 'is-focused': editor.focused, 'autohide': autohide }">
 		<div v-if="isRichEditor" ref="menubar" class="menubar-icons">
 			<template v-for="(icon, $index) in allIcons">
 				<EmojiPicker v-if="icon.class === 'icon-emoji'"
 					:key="icon.label"
 					class="menuitem-emoji"
-					@select="emojiObject => addEmoji(commands, allIcons.find(i => i.class === 'icon-emoji'), emojiObject)">
+					@select="emojiObject => addEmoji(icon, emojiObject)">
 					<button v-tooltip="t('text', 'Insert emoji')"
 						class="icon-emoji"
 						:aria-label="t('text', 'Insert emoji')"
@@ -37,19 +37,19 @@
 					v-show="$index < iconCount"
 					:key="icon.label"
 					v-tooltip="getLabelAndKeys(icon)"
-					:class="getIconClasses(isActive, icon)"
-					:disabled="disabled(commands, icon)"
-					@click="clickIcon(commands, icon)" />
+					:class="getIconClasses(icon)"
+					:disabled="disabled(icon)"
+					@click="clickIcon(icon)" />
 				<template v-else>
 					<div v-show="$index < iconCount || !icon.class"
 						:key="icon.label"
 						v-click-outside="() => hideChildMenu(icon)"
 						class="submenu">
 						<button v-tooltip="getLabelAndKeys(icon)"
-							:class="childIconClasses(isActive, icon.children, )"
+							:class="childIconClasses(icon.children, )"
 							@click.prevent="toggleChildMenu(icon)" />
 						<div :class="{open: isChildMenuVisible(icon)}" class="popovermenu menu-center">
-							<PopoverMenu :menu="childPopoverMenu(isActive, commands, icon.children, icon)" />
+							<PopoverMenu :menu="childPopoverMenu(icon.children, icon)" />
 						</div>
 					</div>
 				</template>
@@ -61,14 +61,14 @@
 						v-tooltip="getKeys(icon)"
 						:icon="icon.class"
 						:close-after-click="true"
-						@click="clickIcon(commands, icon)">
+						@click="clickIcon(icon)">
 						{{ icon.label }}
 					</ActionButton>
 					<!--<template v-else-if="!icon.class && isHiddenInMenu($index)">
 						<ActionButton v-for="childIcon in icon.children"
 							:key="childIcon.class"
 							:icon="childIcon.class"
-							@click="clickIcon(commands, childIcon)">
+							@click="clickIcon(childIcon)">
 							v-tooltip="getKeys(childIcon)"
 							{{ childIcon.label }}
 						</ActionButton>
@@ -113,8 +113,7 @@ export default {
 	props: {
 		editor: {
 			type: Object,
-			required: false,
-			default: null,
+			required: true,
 		},
 		isRichEditor: {
 			type: Boolean,
@@ -149,16 +148,24 @@ export default {
 			return ($index) => $index - this.iconCount >= 0
 		},
 		getIconClasses() {
-			return (isActive, icon) => {
-				const classes = {
-					'is-active': typeof icon.isActive === 'function' ? icon.isActive(isActive) : false,
-				}
+			return (icon) => {
+				const classes = {}
 				classes[icon.class] = true
+				classes['is-active'] = this.isActive(icon)
 				return classes
 			}
 		},
+		isActive() {
+			return ({ isActive }) => {
+				if (!isActive) {
+					return false
+				}
+				const args = Array.isArray(isActive) ? isActive : [isActive]
+				return this.editor.isActive(...args)
+			}
+		},
 		disabled() {
-			return (commands, menuItem) => {
+			return (menuItem) => {
 				return false
 				// FIXME with this we seem to be running into an endless rerender loop, so this needs more investigation at some later point
 				// typeof menuItem.isDisabled === 'function' ? menuItem.isDisabled()(commands) : false
@@ -176,47 +183,35 @@ export default {
 			return [...this.icons, {
 				label: t('text', 'Insert image'),
 				class: 'icon-image',
-				isActive: () => {
-				},
 				action: (commands) => {
 					this.showImagePrompt(commands.image)
 				},
 			}]
 		},
 		childPopoverMenu() {
-			return (isActive, commands, icons, parent) => {
-				const popoverMenuItems = []
-				for (const index in icons) {
-					popoverMenuItems.push({
+			return (icons, parent) => {
+				return icons.map(icon => {
+					return {
 						// text: this.getLabelAndKeys(icons[index]),
-						text: icons[index].label,
-						icon: icons[index].class,
+						text: icon.label,
+						icon: icon.class,
+						active: this.isActive(icon),
 						action: () => {
-							icons[index].action(commands)
+							icon.action(this.editor.commands)
 							this.hideChildMenu(parent)
 						},
-						active: icons[index].isActive(isActive),
-					})
-				}
-				return popoverMenuItems
+					}
+				})
 			}
 		},
 		childIconClasses() {
-			return (isActive, icons) => {
-				const icon = this.childIcon(isActive, icons)
-				return this.getIconClasses(isActive, icon)
+			return (icons) => {
+				const icon = this.childIcon(icons)
+				return this.getIconClasses(icon)
 			}
 		},
 		childIcon() {
-			return (isActive, icons) => {
-				for (const index in icons) {
-					const icon = icons[index]
-					if (icon.isActive(isActive)) {
-						return icon
-					}
-				}
-				return icons[0]
-			}
+			return (icons) => icons.find(icon => this.isActive(icon)) || icons[0]
 		},
 		iconCount() {
 			this.forceRecompute // eslint-disable-line
@@ -252,9 +247,8 @@ export default {
 				this.forceRecompute++
 			})
 		},
-		clickIcon(commands, icon) {
-			this.editor.focus()
-			return icon.action(commands)
+		clickIcon(icon) {
+			return icon.action(this.editor.chain().focus()).run()
 		},
 		getWindowWidth(event) {
 			this.windowWidth = document.documentElement.clientWidth
@@ -334,8 +328,8 @@ export default {
 			}
 			return current.fill('..').concat(target).join('/')
 		},
-		addEmoji(commands, icon, emojiObject) {
-			return icon.action(commands, emojiObject)
+		addEmoji(icon, emojiObject) {
+			return icon.action(this.editor.chain(), emojiObject)
 		},
 		keysString(keyChar, modifiers = []) {
 			const translations = {

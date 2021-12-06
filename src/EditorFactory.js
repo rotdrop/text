@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- */
+*/
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
+import Heading from '@tiptap/extension-heading'
 import History from '@tiptap/extension-history'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Editor } from '@tiptap/core'
@@ -57,6 +58,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 	let richEditingExtensions = []
 	if (enableRichEditing) {
 		richEditingExtensions = [
+			Heading,
 			Strong,
 			Italic,
 			Strike,
