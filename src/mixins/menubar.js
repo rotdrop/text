@@ -133,6 +133,14 @@ export default [
 			return command.toggleBlockquote()
 		},
 	},
+	{
+		label: t('text', 'Code block'),
+		class: 'icon-code',
+		isActive: 'code_block',
+		action: (command) => {
+			return command.toggleCodeBlock()
+		},
+	},
 	/* FIXME: bring these back
 	{
 		label: t('text', 'Unordered list'),
@@ -158,14 +166,6 @@ export default [
 		label: t('text', 'ToDo list'),
 		class: 'icon-checkmark',
 		action: (command) => command.todo_item(),
-	},
-	{
-		label: t('text', 'Code block'),
-		class: 'icon-code',
-		isActive: 'code_block',
-		action: (command) => {
-			return command.toggleCodeBlock()
-		},
 	},
 	{
 		label: t('text', 'Emoji picker'),

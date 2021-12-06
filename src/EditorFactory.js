@@ -25,6 +25,7 @@ import Text from '@tiptap/extension-text'
 import Heading from '@tiptap/extension-heading'
 import History from '@tiptap/extension-history'
 import Blockquote from '@tiptap/extension-blockquote'
+import Codeblock from '@tiptap/extension-code-block'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
@@ -65,6 +66,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			Strike,
 			Link,
 			Blockquote,
+			Codeblock.extend({ name: 'code_block' }),
 			// .configure ({openOnClick: true, }),
 			/*
 			new BulletList(),
