@@ -84,7 +84,7 @@ import { createEditor, markdownit, createMarkdownSerializer, serializePlainText,
 
 import { EditorContent } from '@tiptap/vue-2'
 // import { Emoji, Keymap, UserColor } from './../extensions'
-import { Collaboration } from './../extensions'
+import { Collaboration, Keymap } from './../extensions'
 import isMobile from './../mixins/isMobile'
 import store from './../mixins/store'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
@@ -344,6 +344,12 @@ export default {
 										view.dispatch(tr)
 									},
 								}),
+								Keymap.configure({
+									'Mod-s': () => {
+										this.syncService.save()
+										return true
+									},
+								}),
 							],
 							/* TODO: bring back our extensions
 								new UserColor({
@@ -355,12 +361,6 @@ export default {
 									name: (clientID) => {
 										const session = this.sessions.find(item => '' + item.id === '' + clientID)
 										return session?.userId ? session.userId : session?.guestName
-									},
-								}),
-								new Keymap({
-									'Mod-s': () => {
-										this.syncService.save()
-										return true
 									},
 								}),
 								new Emoji(),
