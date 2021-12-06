@@ -24,6 +24,7 @@ import Paragraph from '@tiptap/extension-paragraph'
 import Text from '@tiptap/extension-text'
 import Heading from '@tiptap/extension-heading'
 import History from '@tiptap/extension-history'
+import Blockquote from '@tiptap/extension-blockquote'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
@@ -63,6 +64,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			Italic,
 			Strike,
 			Link,
+			Blockquote,
 			// .configure ({openOnClick: true, }),
 			/*
 			new BulletList(),

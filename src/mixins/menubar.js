@@ -123,6 +123,16 @@ export default [
 			},
 		],
 	},
+	{
+		label: t('text', 'Blockquote'),
+		keyChar: '>',
+		keyModifiers: ['ctrl'],
+		class: 'icon-quote',
+		isActive: 'blockquote',
+		action: (command) => {
+			return command.toggleBlockquote()
+		},
+	},
 	/* FIXME: bring these back
 	{
 		label: t('text', 'Unordered list'),
@@ -148,16 +158,6 @@ export default [
 		label: t('text', 'ToDo list'),
 		class: 'icon-checkmark',
 		action: (command) => command.todo_item(),
-	},
-	{
-		label: t('text', 'Blockquote'),
-		keyChar: '>',
-		keyModifiers: ['ctrl'],
-		class: 'icon-quote',
-		isActive: 'blockquote',
-		action: (command) => {
-			return command.toggleBlockquote()
-		},
 	},
 	{
 		label: t('text', 'Code block'),
