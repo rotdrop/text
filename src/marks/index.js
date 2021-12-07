@@ -23,10 +23,7 @@
 import Bold from '@tiptap/extension-bold'
 import TipTapItalic from '@tiptap/extension-italic'
 import TipTapStrike from '@tiptap/extension-strike'
-import TipTapLink from '@tiptap/extension-link'
-// import { Plugin } from 'prosemirror-state'
-import { domHref, parseHref } from './../helpers/links'
-// import { markdownit } from './../EditorFactory'
+import Link from './Link'
 
 /**
  * This file maps prosemirror mark names to tiptap classes,
@@ -40,6 +37,7 @@ const Italic = TipTapItalic.extend({
 	name: 'em',
 })
 
+/** Strike is currently unsupported by prosemirror-markdown */
 const Strike = TipTapStrike.extend({
 	parseDOM: [
 		{
@@ -65,80 +63,6 @@ const Strike = TipTapStrike.extend({
 	},
 })
 
-const Link = TipTapLink.extend({
-	attrs: {
-		href: {
-			default: null,
-		},
-	},
-	inclusive: false,
-	parseDOM: [
-		{
-			tag: 'a[href]',
-			getAttrs: dom => ({
-				href: parseHref(dom),
-			}),
-		},
-	],
-	toDOM: node => ['a', {
-		...node.attrs,
-		href: domHref(node),
-		title: node.attrs.href,
-		rel: 'noopener noreferrer nofollow',
-	}, 0],
-})
-
-/* TODO: addProsemirrorPlugins with this:
-	get plugins() {
-		if (!this.options.openOnClick) {
-			return []
-		}
-
-		return [
-			new Plugin({
-				props: {
-					handleClick: (view, pos, event) => {
-						const attrs = this.editor.getAttributes('link')
-
-						const isLink = event.target instanceof HTMLAnchorElement || event.target.parentElement instanceof HTMLAnchorElement
-						if (attrs.href && isLink) {
-							const linkElement = event.target.parentElement instanceof HTMLAnchorElement ? event.target.parentElement : event.target
-							event.stopPropagation()
-							const htmlHref = linkElement.href
-							if (event.button === 0 && !event.ctrlKey && htmlHref.startsWith(window.location.origin)) {
-								const query = OC.parseQueryString(htmlHref)
-								const fragment = OC.parseQueryString(htmlHref.split('#').pop())
-								if (query.dir && fragment.relPath) {
-									const filename = fragment.relPath.split('/').pop()
-									const path = `${query.dir}/${filename}`
-									document.title = `${filename} - ${OC.theme.title}`
-									if (window.location.pathname.match(/apps\/files\/$/)) {
-										// The files app still lacks a popState handler
-										// to allow for using the back button
-										// OC.Util.History.pushState('', htmlHref)
-									}
-									OCA.Viewer.open({ path })
-									return
-								}
-							}
-
-							if (!markdownit.validateLink(htmlHref)) {
-								console.error('Invalid link', htmlHref)
-								return
-							}
-
-							window.open(htmlHref)
-						}
-					},
-				},
-			}),
-		]
-	}
-
-}
-*/
-
-/** Strike is currently unsupported by prosemirror-markdown */
 export {
 	Strong,
 	Italic,

@@ -64,10 +64,9 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			Strong,
 			Italic,
 			Strike,
-			Link,
+			Link.configure({ openOnClick: true }),
 			Blockquote,
 			Codeblock.extend({ name: 'code_block' }),
-			// .configure ({openOnClick: true, }),
 			/*
 			new BulletList(),
 			new ListItem(),
