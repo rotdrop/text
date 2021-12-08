@@ -21,12 +21,8 @@
  */
 
 import TipTapListItem from '@tiptap/extension-list-item'
-
-export default TipTapListItem.extend({})
-
-/*
-import Plugin
-import wrappingInputRule,
+import { wrappingInputRule, mergeAttributes } from '@tiptap/core'
+import { Plugin } from 'prosemirror-state'
 import { findParentNode, findParentNodeClosestToPos } from 'prosemirror-utils'
 import { listInputRule } from '../commands'
 
@@ -41,126 +37,128 @@ const getParentList = (schema, selection) => {
 	})(selection)
 }
 
-export default class ListItem extends TiptapListItem {
+const ListItem = TipTapListItem.extend({
 
-	get defaultOptions() {
+	name: 'list_item',
+
+	addOptions() {
 		return {
 			nested: true,
 		}
-	}
+	},
 
-	get schema() {
+	addAttributes() {
 		return {
-			attrs: {
-				done: {
-					default: false,
-				},
-				type: {
-					default: TYPES.BULLET,
-				},
+			done: {
+				default: false,
 			},
-			draggable: false,
-			content: 'paragraph block*',
-			toDOM: node => {
-				if (node.attrs.type === TYPES.BULLET) {
-					return ['li', 0]
-				}
-				const listAttributes = { class: 'checkbox-item' }
-				const checkboxAttributes = { type: 'checkbox', class: '', contenteditable: false }
-				if (node.attrs.done) {
-					checkboxAttributes.checked = true
-					listAttributes.class += ' checked'
-				}
-				return [
-					'li',
-					listAttributes,
-					[
-						'input',
-						checkboxAttributes,
-					],
-					[
-						'label',
-						0,
-					],
-				]
-			},
-			parseDOM: [
-				{
-					priority: 100,
-					tag: 'li',
-					getAttrs: el => {
-						const checkbox = el.querySelector('input[type=checkbox]')
-						return { done: checkbox && checkbox.checked, type: checkbox ? TYPES.CHECKBOX : TYPES.BULLET }
-					},
-				},
-			],
-			toMarkdown: (state, node) => {
-				if (node.attrs.type === TYPES.CHECKBOX) {
-					state.write(`[${node.attrs.done ? 'x' : ' '}] `)
-				}
-				state.renderContent(node)
+			type: {
+				default: TYPES.BULLET,
 			},
 		}
-	}
+	},
+
+	draggable: false,
+
+	content: 'paragraph block*',
+
+	renderHTML({ node, HTMLAttributes }) {
+		if (node.attrs.type === TYPES.BULLET) {
+			return ['li', HTMLAttributes, 0]
+		}
+		const listAttributes = { class: 'checkbox-item' }
+		const checkboxAttributes = { type: 'checkbox', class: '', contenteditable: false }
+		if (node.attrs.done) {
+			checkboxAttributes.checked = true
+			listAttributes.class += ' checked'
+		}
+		return [
+			'li',
+			mergeAttributes(HTMLAttributes, listAttributes),
+			[
+				'input',
+				checkboxAttributes,
+			],
+			[
+				'label',
+				0,
+			],
+		]
+	},
+
+	parseHTML: [
+		{
+			priority: 100,
+			tag: 'li',
+			getAttrs: el => {
+				const checkbox = el.querySelector('input[type=checkbox]')
+				return { done: checkbox && checkbox.checked, type: checkbox ? TYPES.CHECKBOX : TYPES.BULLET }
+			},
+		},
+	],
+
+	toMarkdown: (state, node) => {
+		if (node.attrs.type === TYPES.CHECKBOX) {
+			state.write(`[${node.attrs.done ? 'x' : ' '}] `)
+		}
+		state.renderContent(node)
+	},
 
 	addCommands() {
 		return {
 			bulletListItem: () => ({ commands }) => {
-				return commands.toggleList()
+				return commands.toggleList('bullet_list', 'list_item')
 			},
-			todo_item: () => ({ commands }) => {
-				return (state, dispatch, view) => {
-					const schema = state.schema
-					const selection = state.selection
-					const $from = selection.$from
-					const $to = selection.$to
-					const range = $from.blockRange($to)
+			todo_item: () => ({ chain, commands, state }) => {
+				const schema = state.schema
+				const selection = state.selection
+				const $from = selection.$from
+				const $to = selection.$to
+				const range = $from.blockRange($to)
 
-					let tr = state.tr
-					let parentList = getParentList(schema, selection)
-
-					if (typeof parentList === 'undefined') {
-						// FIXME: not sure how this command now works
-						commands.toggleList(schema.nodes.bullet_list, type)(state, (_transaction) => {
-							tr = _transaction
-						}, view)
-						parentList = getParentList(schema, tr.selection)
-					}
-
-					if (!range || typeof parentList === 'undefined') {
-						return false
-					}
-
-					tr.setNodeMarkup(parentList.pos, schema.nodes.list_item, { type: parentList.node.attrs.type === TYPES.CHECKBOX ? TYPES.BULLET : TYPES.CHECKBOX })
-					tr.scrollIntoView()
-
-					if (dispatch) {
-						dispatch(tr)
-					}
-
+				if (!range) {
+					return false
 				}
+
+				let parentList = getParentList(schema, selection)
+
+				const start = (typeof parentList === 'undefined')
+					? chain().bulletListItem()
+					: chain()
+
+				start
+					.command(({ tr }) => {
+						if (typeof parentList === 'undefined') {
+							parentList = getParentList(schema, tr.selection)
+						}
+
+						if (typeof parentList === 'undefined') {
+							return false
+						}
+						tr.setNodeMarkup(parentList.pos, schema.nodes.list_item, {
+							type: parentList.node.attrs.type === TYPES.CHECKBOX ? TYPES.BULLET : TYPES.CHECKBOX,
+						})
+						tr.scrollIntoView()
+					})
+					.run()
 			},
 		}
-	}
+	},
 
-	inputRules({ type }) {
+	addInputRules() {
 		return [
-			wrappingInputRule(/^\s*([-+*])\s(\[ ?\])\s$/, type, (match) => {
-				return {
-					type: TYPES.CHECKBOX,
-				}
+			wrappingInputRule({
+				find: /^\s*([-+*])\s(\[(x|X| ?)\])\s$/,
+				type: TYPES.CHECKBOX,
+				getAttributes: match => ({
+					done: 'xX'.includes(match[match.length - 1]),
+				}),
 			}),
-			wrappingInputRule(/^\s*([-+*])\s(\[(x|X)\])\s$/, type, (match) => {
-				return {
-					type: TYPES.CHECKBOX,
-					done: true,
-				}
-			}),
-			listInputRule(/^\s*([-+*])\s([^\s[])$/, type),
+			listInputRule(/^\s*([-+*])\s([^\s[])$/, this.type),
 		]
-	}
+	},
 
-	get plugins() {
+	addProseMirrorPlugins() {
 		return [
 			new Plugin({
 				props: {
@@ -185,7 +183,8 @@ export default class ListItem extends TiptapListItem {
 				},
 			}),
 		]
-	}
+	},
 
-}
-*/
+})
+
+export default ListItem

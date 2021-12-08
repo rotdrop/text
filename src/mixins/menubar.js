@@ -124,6 +124,31 @@ export default [
 		],
 	},
 	{
+		label: t('text', 'Unordered list'),
+		keyChar: '8',
+		keyModifiers: ['ctrl', 'shift'],
+		class: 'icon-ul',
+		isActive: 'bullet_list',
+		action: (command) => {
+			return command.bulletListItem()
+		},
+	},
+	{
+		label: t('text', 'Ordered list'),
+		keyChar: '9',
+		keyModifiers: ['ctrl', 'shift'],
+		class: 'icon-ol',
+		isActive: 'ordered_list',
+		action: (command) => {
+			return command.toggleOrderedList()
+		},
+	},
+	{
+		label: t('text', 'ToDo list'),
+		class: 'icon-checkmark',
+		action: (command) => command.todo_item(),
+	},
+	{
 		label: t('text', 'Blockquote'),
 		keyChar: '>',
 		keyModifiers: ['ctrl'],
@@ -142,31 +167,6 @@ export default [
 		},
 	},
 	/* FIXME: bring these back
-	{
-		label: t('text', 'Unordered list'),
-		keyChar: '8',
-		keyModifiers: ['ctrl', 'shift'],
-		class: 'icon-ul',
-		isActive: 'bullet_list',
-		action: (command) => {
-			return command.bullet_list_item()
-		},
-	},
-	{
-		label: t('text', 'Ordered list'),
-		keyChar: '9',
-		keyModifiers: ['ctrl', 'shift'],
-		class: 'icon-ol',
-		isActive: 'ordered_list',
-		action: (command) => {
-			return command.ordered_list()
-		},
-	},
-	{
-		label: t('text', 'ToDo list'),
-		class: 'icon-checkmark',
-		action: (command) => command.todo_item(),
-	},
 	{
 		label: t('text', 'Emoji picker'),
 		class: 'icon-emoji',

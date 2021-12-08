@@ -27,8 +27,10 @@ import History from '@tiptap/extension-history'
 import Blockquote from '@tiptap/extension-blockquote'
 import Codeblock from '@tiptap/extension-code-block'
 import Placeholder from '@tiptap/extension-placeholder'
+import OrderedList from '@tiptap/extension-ordered-list'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
+import { BulletList, ListItem } from './nodes'
 // import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
@@ -67,9 +69,20 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			Link.configure({ openOnClick: true }),
 			Blockquote,
 			Codeblock.extend({ name: 'code_block' }),
+			OrderedList.extend({
+				name: 'ordered_list',
+				content: 'list_item+',
+				addCommands() {
+					return {
+						toggleOrderedList: () => ({ commands }) => {
+							return commands.toggleList(this.name, 'list_item')
+						},
+					}
+				},
+			}),
+			BulletList,
+			ListItem,
 			/*
-			new BulletList(),
-			new ListItem(),
 			new Image({ currentDirectory }),
 			*/
 			Placeholder.configure({
