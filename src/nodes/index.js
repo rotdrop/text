@@ -20,13 +20,13 @@
  *
  */
 
-// import Image from './Image'
+import Image from './Image'
 // import PlainTextDocument from './PlainTextDocument'
 import ListItem from './ListItem'
 import BulletList from './BulletList'
 
 export {
-	// Image,
+	Image,
 	// PlainTextDocument,
 	ListItem,
 	BulletList,

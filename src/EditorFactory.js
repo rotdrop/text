@@ -30,7 +30,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import OrderedList from '@tiptap/extension-ordered-list'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
-import { BulletList, ListItem } from './nodes'
+import { Image, BulletList, ListItem } from './nodes'
 // import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
@@ -72,9 +72,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			OrderedList,
 			BulletList,
 			ListItem,
-			/*
-			new Image({ currentDirectory }),
-			*/
+			Image.configure({ currentDirectory }),
 			Placeholder.configure({
 				emptyNodeClass: 'is-empty',
 				placeholder: t('text', 'Add notes, lists or links …'),

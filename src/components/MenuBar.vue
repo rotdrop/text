@@ -184,7 +184,7 @@ export default {
 				label: t('text', 'Insert image'),
 				class: 'icon-image',
 				action: (commands) => {
-					this.showImagePrompt(commands.image)
+					return this.showImagePrompt(commands.setImage)
 				},
 			}]
 		},
@@ -248,7 +248,10 @@ export default {
 			})
 		},
 		clickIcon(icon) {
-			return icon.action(this.editor.chain().focus()).run()
+			// Some actions run themselves.
+			// others still need to have .run() called upon them.
+			const action = icon.action(this.editor.chain().focus())
+			action && action.run()
 		},
 		getWindowWidth(event) {
 			this.windowWidth = document.documentElement.clientWidth
@@ -287,7 +290,7 @@ export default {
 					_command({
 						src,
 						alt: fileInfo.name,
-					})
+					}).run()
 				})
 			}, false, [], true, undefined, this.imagePath)
 		},
