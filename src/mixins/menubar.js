@@ -128,7 +128,7 @@ export default [
 		keyChar: '8',
 		keyModifiers: ['ctrl', 'shift'],
 		class: 'icon-ul',
-		isActive: 'bullet_list',
+		isActive: 'bulletList',
 		action: (command) => {
 			return command.bulletListItem()
 		},
@@ -138,7 +138,7 @@ export default [
 		keyChar: '9',
 		keyModifiers: ['ctrl', 'shift'],
 		class: 'icon-ol',
-		isActive: 'ordered_list',
+		isActive: 'orderedList',
 		action: (command) => {
 			return command.toggleOrderedList()
 		},
@@ -146,6 +146,8 @@ export default [
 	{
 		label: t('text', 'ToDo list'),
 		class: 'icon-checkmark',
+		// Do we want to indicate that the current item is a todo item?
+		// isActive: ['listItem', { type: 1 }],
 		action: (command) => command.todo_item(),
 	},
 	{
@@ -161,7 +163,7 @@ export default [
 	{
 		label: t('text', 'Code block'),
 		class: 'icon-code',
-		isActive: 'code_block',
+		isActive: 'codeBlock',
 		action: (command) => {
 			return command.toggleCodeBlock()
 		},

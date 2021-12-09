@@ -28,9 +28,6 @@ import TiptapBulletList from '@tiptap/extension-bullet-list'
  * even inside a list with bullet points.
  */
 const BulletList = TiptapBulletList.extend({
-	name: 'bullet_list',
-
-	content: 'list_item+',
 
 	addInputRules() {
 		return []

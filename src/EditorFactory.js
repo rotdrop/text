@@ -68,18 +68,8 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 			Strike,
 			Link.configure({ openOnClick: true }),
 			Blockquote,
-			Codeblock.extend({ name: 'code_block' }),
-			OrderedList.extend({
-				name: 'ordered_list',
-				content: 'list_item+',
-				addCommands() {
-					return {
-						toggleOrderedList: () => ({ commands }) => {
-							return commands.toggleList(this.name, 'list_item')
-						},
-					}
-				},
-			}),
+			Codeblock,
+			OrderedList,
 			BulletList,
 			ListItem,
 			/*
@@ -124,7 +114,20 @@ const markdownit = MarkdownIt('commonmark', { html: false, breaks: false })
 const SerializeException = function(message) {
 	this.message = message
 }
+
+const convertNames = (object) => {
+	const convert = (name) => {
+		return name.replace(/_(\w)/g, (_m, letter) => letter.toUpperCase())
+	}
+	return Object.fromEntries(
+		Object.entries(object)
+			.map(([name, value]) => [convert(name), value])
+	)
+}
+
 const createMarkdownSerializer = (_nodes, _marks) => {
+	const defaultNodes = convertNames(defaultMarkdownSerializer.nodes)
+	const defaultMarks = convertNames(defaultMarkdownSerializer.marks)
 	const nodes = Object
 		.entries(_nodes)
 		.filter(([, node]) => node.toMarkdown)
@@ -132,7 +135,6 @@ const createMarkdownSerializer = (_nodes, _marks) => {
 			...items,
 			[name]: toMarkdown,
 		}), {})
-
 	const marks = Object
 		.entries(_marks)
 		.filter(([, node]) => node.toMarkdown)
@@ -142,8 +144,8 @@ const createMarkdownSerializer = (_nodes, _marks) => {
 		}), {})
 	return {
 		serializer: new MarkdownSerializer(
-			{ ...defaultMarkdownSerializer.nodes, ...nodes },
-			{ ...defaultMarkdownSerializer.marks, ...marks }
+			{ ...defaultNodes, ...nodes },
+			{ ...defaultMarks, ...marks }
 		),
 		serialize(content, options) {
 			return this.serializer.serialize(content, { ...options, tightLists: true })

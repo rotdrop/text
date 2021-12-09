@@ -33,13 +33,11 @@ const TYPES = {
 
 const getParentList = (schema, selection) => {
 	return findParentNode(function(node) {
-		return node.type === schema.nodes.list_item
+		return node.type === schema.nodes.listItem
 	})(selection)
 }
 
 const ListItem = TipTapListItem.extend({
-
-	name: 'list_item',
 
 	addOptions() {
 		return {
@@ -107,7 +105,7 @@ const ListItem = TipTapListItem.extend({
 	addCommands() {
 		return {
 			bulletListItem: () => ({ commands }) => {
-				return commands.toggleList('bullet_list', 'list_item')
+				return commands.toggleList('bulletList', 'listItem')
 			},
 			todo_item: () => ({ chain, commands, state }) => {
 				const schema = state.schema
@@ -135,7 +133,7 @@ const ListItem = TipTapListItem.extend({
 						if (typeof parentList === 'undefined') {
 							return false
 						}
-						tr.setNodeMarkup(parentList.pos, schema.nodes.list_item, {
+						tr.setNodeMarkup(parentList.pos, schema.nodes.listItem, {
 							type: parentList.node.attrs.type === TYPES.CHECKBOX ? TYPES.BULLET : TYPES.CHECKBOX,
 						})
 						tr.scrollIntoView()
@@ -169,7 +167,7 @@ const ListItem = TipTapListItem.extend({
 						const coordinates = view.posAtCoords({ left: event.clientX, top: event.clientY })
 						const position = state.doc.resolve(coordinates.pos)
 						const parentList = findParentNodeClosestToPos(position, function(node) {
-							return node.type === schema.nodes.list_item
+							return node.type === schema.nodes.listItem
 						})
 						const isListClicked = event.target.tagName.toLowerCase() === 'li'
 						if (typeof parentList === 'undefined' || parentList.node.attrs.type !== TYPES.CHECKBOX || !isListClicked) {
@@ -177,7 +175,7 @@ const ListItem = TipTapListItem.extend({
 						}
 
 						const tr = state.tr
-						tr.setNodeMarkup(parentList.pos, schema.nodes.list_item, { done: !parentList.node.attrs.done, type: TYPES.CHECKBOX })
+						tr.setNodeMarkup(parentList.pos, schema.nodes.listItem, { done: !parentList.node.attrs.done, type: TYPES.CHECKBOX })
 						view.dispatch(tr)
 					},
 				},
