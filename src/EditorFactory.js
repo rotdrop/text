@@ -31,6 +31,7 @@ import OrderedList from '@tiptap/extension-ordered-list'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
 import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
+import { TrailingNode } from './extensions'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
 import { translate as t } from '@nextcloud/l10n'
@@ -77,9 +78,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 				placeholder: t('text', 'Add notes, lists or links …'),
 				showOnlyWhenEditable: true,
 			}),
-			// TODO: replace this
-			// https://github.com/ueberdosis/tiptap/tree/main/demos/src/Experiments/TrailingNode
-			// new TrailingNode({ node: 'paragraph', notAfter: ['paragraph'], }),
+			TrailingNode,
 		]
 	} else {
 		richEditingExtensions = [
