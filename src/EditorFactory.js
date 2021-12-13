@@ -30,8 +30,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import OrderedList from '@tiptap/extension-ordered-list'
 import { Editor } from '@tiptap/core'
 import { Strong, Italic, Strike, Link } from './marks'
-import { Image, BulletList, ListItem } from './nodes'
-// import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
+import { Image, PlainTextDocument, ListItem, BulletList } from './nodes'
 import MarkdownIt from 'markdown-it'
 import taskLists from 'markdown-it-task-lists'
 import { translate as t } from '@nextcloud/l10n'
@@ -84,8 +83,8 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 		]
 	} else {
 		richEditingExtensions = [
+			PlainTextDocument,
 			// disable our custom extensions for now
-			// PlainTextDocument,
 			// FIXME: Do we want to use CodeBlockLowlight instead?
 			// new CodeBlockHighlight({ ...languages, }),
 		]

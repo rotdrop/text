@@ -22,7 +22,7 @@
 
 import { Node } from '@tiptap/core'
 
-export default Node.create({
+const PlainTextDocument = Node.create({
 	name: 'doc',
 	content: 'block',
 	addKeyboardShortcuts() {
@@ -32,3 +32,5 @@ export default Node.create({
 	},
 
 })
+
+export default PlainTextDocument
