@@ -83,6 +83,7 @@ const createEditor = ({ content, onCreate, onUpdate, extensions, enableRichEditi
 	} else {
 		richEditingExtensions = [
 			PlainTextDocument,
+			Codeblock,
 			// disable our custom extensions for now
 			// FIXME: Do we want to use CodeBlockLowlight instead?
 			// new CodeBlockHighlight({ ...languages, }),
