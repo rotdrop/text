@@ -84,7 +84,7 @@ import { createEditor, markdownit, createMarkdownSerializer, serializePlainText,
 
 import { EditorContent } from '@tiptap/vue-2'
 // import { Emoji, Keymap, UserColor } from './../extensions'
-import { Collaboration, Keymap } from './../extensions'
+import { Collaboration, Keymap, UserColor } from './../extensions'
 import isMobile from './../mixins/isMobile'
 import store from './../mixins/store'
 import Tooltip from '@nextcloud/vue/dist/Directives/Tooltip'
@@ -350,9 +350,7 @@ export default {
 										return true
 									},
 								}),
-							],
-							/* TODO: bring back our extensions
-								new UserColor({
+								UserColor.configure({
 									clientID: this.currentSession.id,
 									color: (clientID) => {
 										const session = this.sessions.find(item => '' + item.id === '' + clientID)
@@ -363,9 +361,10 @@ export default {
 										return session?.userId ? session.userId : session?.guestName
 									},
 								}),
+							/* TODO: bring back our extensions
 								new Emoji(),
-							],
 							*/
+							],
 							enableRichEditing: this.isRichEditor,
 							languages,
 							currentDirectory: this.currentDirectory,

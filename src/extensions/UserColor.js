@@ -26,13 +26,11 @@ import { Decoration, DecorationSet } from 'prosemirror-view'
 import TrackState from './tracking/TrackState'
 import { Span } from './tracking/models'
 
-export default class UserColor extends Extension {
+const UserColor = Extension.create({
 
-	get name() {
-		return 'users'
-	}
+	name: 'users',
 
-	get defaultOptions() {
+	addOptions() {
 		return {
 			clientID: 0,
 			color: (clientID) => {
@@ -42,9 +40,9 @@ export default class UserColor extends Extension {
 				return 'Unknown user ' + clientID
 			},
 		}
-	}
+	},
 
-	get plugins() {
+	addProseMirrorPlugins() {
 		return [
 			new Plugin({
 				clientID: this.options.clientID,
@@ -87,6 +85,8 @@ export default class UserColor extends Extension {
 				},
 			}),
 		]
-	}
+	},
 
-}
+})
+
+export default UserColor
