@@ -332,7 +332,7 @@ export default {
 			return current.fill('..').concat(target).join('/')
 		},
 		addEmoji(icon, emojiObject) {
-			return icon.action(this.editor.chain(), emojiObject)
+			icon.action(this.editor.chain().focus(), emojiObject).run()
 		},
 		keysString(keyChar, modifiers = []) {
 			const translations = {

@@ -168,13 +168,11 @@ export default [
 			return command.toggleCodeBlock()
 		},
 	},
-	/* FIXME: bring these back
 	{
 		label: t('text', 'Emoji picker'),
 		class: 'icon-emoji',
 		action: (command, emojiObject) => {
-			return command.emoji(emojiObject)
+			return command.insertContent(emojiObject)
 		},
 	},
-	*/
 ]
