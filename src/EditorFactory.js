@@ -47,7 +47,9 @@ const loadSyntaxHighlight = async (language) => {
 	console.info(list)
 	if (!lowlight.listLanguages().includes(language)) {
 		try {
-			const syntax = await import(/* webpackChunkName: "highlight/[request]" */'highlight.js/lib/languages/' + language)
+			const syntax = await import(
+				/* webpackChunkName: "highlight/[request]" */
+				'../node_modules/highlight.js/lib/languages/' + language)
 			lowlight.registerLanguage(language, syntax.default)
 		} catch (e) {
 			// No matching highlighing found, fallback to none
