@@ -53,11 +53,9 @@
 					<slot name="header" />
 				</MenuBar>
 				<div class="content-wrapper">
-					<!--
-					<MenuBubble v-if="!readOnly && isRichEditor"
+					<MenuBubble v-if="tiptap && !readOnly && isRichEditor"
 						:editor="tiptap"
 						:file-path="relativePath" />
-					-->
 					<EditorContent v-show="initialLoading"
 						class="editor__content"
 						:editor="tiptap" />
@@ -83,6 +81,7 @@ import { extensionHighlight } from '../helpers/mappings'
 import { createEditor, markdownit, createMarkdownSerializer, serializePlainText, loadSyntaxHighlight } from './../EditorFactory'
 
 import { EditorContent } from '@tiptap/vue-2'
+import { BubbleMenu } from '@tiptap/extension-bubble-menu'
 // import { Emoji, Keymap, UserColor } from './../extensions'
 import { Collaboration, Keymap, UserColor } from './../extensions'
 import isMobile from './../mixins/isMobile'
@@ -98,7 +97,7 @@ export default {
 	components: {
 		EditorContent,
 		MenuBar: () => import(/* webpackChunkName: "editor-rich" */'./MenuBar'),
-		// MenuBubble: () => import(/* webpackChunkName: "editor-rich" */'./MenuBubble'),
+		MenuBubble: () => import(/* webpackChunkName: "editor-rich" */'./MenuBubble'),
 		ReadOnlyEditor: () => import(/* webpackChunkName: "editor" */'./ReadOnlyEditor'),
 		CollisionResolveDialog: () => import(/* webpackChunkName: "editor" */'./CollisionResolveDialog'),
 		// GuestNameDialog: () => import(/* webpackChunkName: "editor-guest" */'./GuestNameDialog'),
@@ -361,9 +360,11 @@ export default {
 										return session?.userId ? session.userId : session?.guestName
 									},
 								}),
-							/* TODO: bring back our extensions
-								new Emoji(),
-							*/
+								BubbleMenu.configure({
+									tippyOptions: {
+										duration: 200,
+									},
+								}),
 							],
 							enableRichEditing: this.isRichEditor,
 							languages,
