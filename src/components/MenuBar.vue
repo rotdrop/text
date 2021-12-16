@@ -21,7 +21,7 @@
   -->
 
 <template>
-	<div class="menubar" :class="{ 'is-focused': editor.focused, 'autohide': autohide }">
+	<div class="menubar" :class="{ 'is-focused': editor.isFocused, 'autohide': autohide }">
 		<div v-if="isRichEditor" ref="menubar" class="menubar-icons">
 			<template v-for="(icon, $index) in allIcons">
 				<EmojiPicker v-if="icon.class === 'icon-emoji'"
