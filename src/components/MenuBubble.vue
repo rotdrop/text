@@ -153,11 +153,12 @@ export default {
 				client.getFileInfo(file).then((_status, fileInfo) => {
 					const path = optimalPath(this.filePath, `${fileInfo.path}/${fileInfo.name}`)
 					const encodedPath = path.split('/').map(encodeURIComponent).join('/')
-					const href = `${encodedPath}?fileId=${fileInfo.id}`
+					const dirMarker = (fileInfo.mimetype === 'httpd/unix-directory') ? '/' : ''
+					const href = `${encodedPath}${dirMarker}?fileId=${fileInfo.id}`
 					this.$editor.chain().setLink({ href }).focus().run()
 					this.hideLinkMenu()
 				})
-			}, false, [], true, undefined, startPath)
+			}, false, [], true, undefined, startPath, { allowDirectoryChooser: true })
 		},
 		setLinkUrl() {
 			let url = this.linkUrl
