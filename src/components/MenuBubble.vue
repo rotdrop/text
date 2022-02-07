@@ -140,14 +140,16 @@ export default {
 				client.getFileInfo(file).then((_status, fileInfo) => {
 					const path = optimalPath(this.filePath, `${fileInfo.path}/${fileInfo.name}`)
 					const encodedPath = path.split('/').map(encodeURIComponent).join('/')
-					// add context to hack around unset OCA.Viewer.file being unset
-					// when editing Readme.md in "Richworkspace"-mode,
 					OCA.Text.RichWorkspaceFilePath = this.filePath
-					command({ href: `${encodedPath}?fileId=${fileInfo.id}` })
+					if (fileInfo.mimetype === 'httpd/unix-directory') {
+						command({ href: `${encodedPath}/?fileId=${fileInfo.id}` })
+					} else {
+						command({ href: `${encodedPath}?fileId=${fileInfo.id}` })
+					}
 					OCA.Text.RichWorkspaceFilePath = ''
 					this.hideLinkMenu()
 				})
-			}, false, [], true, undefined, startPath)
+			}, false, [], true, undefined, startPath, { allowDirectoryChooser: true })
 		},
 		setLinkUrl(command, url) {
 			// Heuristics for determining if we need a https:// prefix.

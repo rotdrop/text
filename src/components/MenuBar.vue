@@ -312,7 +312,7 @@ export default {
 						href,
 					})
 				})
-			}, false, [], true, undefined, this.linkPath)
+			}, false, [], true, undefined, this.linkPath, { allowDirectoryChooser: true })
 		},
 		optimalPathTo(targetFile) {
 			const absolutePath = targetFile.split('/')
