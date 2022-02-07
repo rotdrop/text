@@ -140,15 +140,14 @@ export default {
 				client.getFileInfo(file).then((_status, fileInfo) => {
 					const path = optimalPath(this.filePath, `${fileInfo.path}/${fileInfo.name}`)
 					const encodedPath = path.split('/').map(encodeURIComponent).join('/')
-					// add context to hack around unset OCA.Viewer.file being unset
-					// when editing Readme.md in "Richworkspace"-mode,
 					OCA.Text.RichWorkspaceFilePath = this.filePath
-					const href = `${encodedPath}?fileId=${fileInfo.id}`
+					const dirMarker = (fileInfo.mimetype === 'httpd/unix-directory') ? '/' : ''
+					const href = `${encodedPath}${dirMarker}?fileId=${fileInfo.id}`
 					this.$editor.chain().setLink({ href }).focus().run()
 					OCA.Text.RichWorkspaceFilePath = ''
 					this.hideLinkMenu()
 				})
-			}, false, [], true, undefined, startPath)
+			}, false, [], true, undefined, startPath, { allowDirectoryChooser: true })
 		},
 		setLinkUrl() {
 			let url = this.linkUrl
