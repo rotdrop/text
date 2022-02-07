@@ -60,8 +60,13 @@ const domHref = function(node) {
 		const [, relPath, id] = match
 		const file = OCA.Viewer.file || OCA.Text.RichWorkspaceFilePath
 		const currentDir = basedir(file)
-		const dir = absolutePath(currentDir, basedir(relPath))
-		return generateUrl(`/apps/files/?dir=${dir}&openfile=${id}#relPath=${relPath}`)
+		if (relPath.slice(-1) === '/') {
+			const dir = absolutePath(currentDir, relPath)
+			return generateUrl(`/apps/files/?dir=${dir}&openfile=${id}`)
+		} else {
+			const dir = absolutePath(currentDir, basedir(relPath))
+			return generateUrl(`/apps/files/?dir=${dir}&openfile=${id}#relPath=${relPath}`)
+		}
 	}
 }
 
