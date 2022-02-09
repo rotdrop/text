@@ -40,3 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		theme: 'default',
 	})
 })
+
+OCA.Text = {
+	RichWorkspaceFilePath: '',
+}
