@@ -22,6 +22,7 @@
 
 import ViewerComponent from './components/ViewerComponent.vue'
 import { openMimetypesMarkdown, openMimetypesPlainText } from './helpers/mime.js'
+import { loadState } from '@nextcloud/initial-state'
 
 __webpack_nonce__ = btoa(OC.requestToken) // eslint-disable-line
 __webpack_public_path__ = OC.linkTo('text', 'js/') // eslint-disable-line
@@ -38,6 +39,9 @@ if (typeof OCA.Viewer === 'undefined') {
 	})
 }
 
-OCA.Text = {
-	RichWorkspaceFilePath: '',
+if (!OCA.Text) {
+	OCA.Text = {
+		RichWorkspaceEnabled: loadState('text', 'workspace_enabled'),
+		RichWorkspaceFilePath: '',
+	}
 }
