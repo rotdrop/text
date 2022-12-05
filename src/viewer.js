@@ -44,7 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 if (!OCA.Text) {
 	OCA.Text = {
-		RichWorkspaceEnabled: loadState('text', 'workspace_enabled'),
+		RichWorkspaceEnabled: false,
 		RichWorkspaceFilePath: '',
+	}
+	try {
+		OCA.Text.RichWorkspaceEnabled = loadState('text', 'workspace_enabled')
+	} catch (e) {
+		console.debug('NO INITIAL STATE FOR TEXT')
 	}
 }
