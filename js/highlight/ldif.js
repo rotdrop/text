@@ -1,2 +1,56 @@
-(self.webpackChunk_nextcloud_text=self.webpackChunk_nextcloud_text||[]).push([["highlight/ldif"],{39612:e=>{e.exports=function(e){return{name:"LDIF",contains:[{className:"attribute",begin:"^dn",end:": ",excludeEnd:!0,starts:{end:"$",relevance:0},relevance:10},{className:"attribute",begin:"^\\w",end:": ",excludeEnd:!0,starts:{end:"$",relevance:0}},{className:"literal",begin:"^-",end:"$"},e.HASH_COMMENT_MODE]}}}}]);
-//# sourceMappingURL=ldif.js.map?v=ee642bc5c4957af5a4d1
+(self["webpackChunk_nextcloud_text"] = self["webpackChunk_nextcloud_text"] || []).push([["highlight/ldif"],{
+
+/***/ "./node_modules/highlight.js/lib/languages/ldif.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/highlight.js/lib/languages/ldif.js ***!
+  \*********************************************************/
+/***/ ((module) => {
+
+/*
+Language: LDIF
+Contributors: Jacob Childress <jacobc@gmail.com>
+Category: enterprise, config
+Website: https://en.wikipedia.org/wiki/LDAP_Data_Interchange_Format
+*/
+function ldif(hljs) {
+  return {
+    name: 'LDIF',
+    contains: [
+      {
+        className: 'attribute',
+        begin: '^dn',
+        end: ': ',
+        excludeEnd: true,
+        starts: {
+          end: '$',
+          relevance: 0
+        },
+        relevance: 10
+      },
+      {
+        className: 'attribute',
+        begin: '^\\w',
+        end: ': ',
+        excludeEnd: true,
+        starts: {
+          end: '$',
+          relevance: 0
+        }
+      },
+      {
+        className: 'literal',
+        begin: '^-',
+        end: '$'
+      },
+      hljs.HASH_COMMENT_MODE
+    ]
+  };
+}
+
+module.exports = ldif;
+
+
+/***/ })
+
+}]);
+//# sourceMappingURL=ldif.js.map?v=b96e9a94ab6c31fa2e83
